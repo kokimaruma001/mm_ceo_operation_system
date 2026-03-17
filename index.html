@@ -724,12 +724,14 @@ function updateStreak() {
 }
 
 // MCP SERVERS
-const MCP_SERVERS = [
+// Connectors require Claude.ai OAuth session — disabled in standalone/mobile deployment
+const IS_CLAUDE_AI = window.location.hostname.includes('claude.ai');
+const MCP_SERVERS = IS_CLAUDE_AI ? [
   { type: 'url', url: 'https://gmail.mcp.claude.com/mcp',  name: 'gmail' },
   { type: 'url', url: 'https://gcal.mcp.claude.com/mcp',   name: 'google-calendar' },
   { type: 'url', url: 'https://mcp.notion.com/mcp',        name: 'notion' },
   { type: 'url', url: 'https://mcp.canva.com/mcp',         name: 'canva' }
-];
+] : [];
 
 const CONNECTOR_META = {
   'gmail':           { label: 'Gmail',            dotId: 'dot-gmail',    statusId: 'status-gmail' },
@@ -756,11 +758,12 @@ function setConnectorActive(serverName, active) {
 }
 
 function resetConnectors() {
+  const label = IS_CLAUDE_AI ? 'Ready' : 'claude.ai only';
   Object.values(CONNECTOR_META).forEach(meta => {
     const dot = document.getElementById(meta.dotId);
     const status = document.getElementById(meta.statusId);
-    if (dot) dot.classList.remove('active');
-    if (status) { status.textContent = 'Ready'; status.classList.remove('live'); }
+    if (dot) { dot.classList.remove('active'); if (!IS_CLAUDE_AI) dot.style.background = 'var(--text-dim)'; }
+    if (status) { status.textContent = label; status.classList.remove('live'); }
   });
 }
 
@@ -780,16 +783,16 @@ async function sendMessage() {
 
   messages.push({ role: 'user', content: text });
   appendMsg('user', text);
-  showThinking('Pulling Gmail and Calendar');
+  showThinking(IS_CLAUDE_AI ? 'Pulling Gmail and Calendar' : 'Reviewing');
 
-  // Animate connectors sequentially to reflect tool polling
+  // Animate connectors sequentially (only in claude.ai where MCP is active)
   const connSeq = ['gmail', 'google-calendar', 'notion'];
   let ci = 0;
-  const connTimer = setInterval(() => {
+  const connTimer = IS_CLAUDE_AI ? setInterval(() => {
     if (ci > 0) setConnectorActive(connSeq[ci - 1], false);
     if (ci < connSeq.length) { setConnectorActive(connSeq[ci], true); ci++; }
     else clearInterval(connTimer);
-  }, 1800);
+  }, 1800) : null;
 
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
@@ -800,16 +803,15 @@ async function sendMessage() {
         'anthropic-version': '2023-06-01',
         'anthropic-dangerous-direct-browser-access': 'true'
       },
-      body: JSON.stringify({
+      body: JSON.stringify(Object.assign({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 2000,
         system: SYSTEM_PROMPT,
-        messages: buildCtx(messages),
-        mcp_servers: MCP_SERVERS
-      })
+        messages: buildCtx(messages)
+      }, MCP_SERVERS.length ? { mcp_servers: MCP_SERVERS } : {}))
     });
 
-    clearInterval(connTimer);
+    if (connTimer) clearInterval(connTimer);
     const data = await res.json();
 
     // Identify which tools were actually used
@@ -840,7 +842,7 @@ async function sendMessage() {
     document.getElementById('total-sessions').textContent = getAllSessions().length;
     updateStreak();
   } catch(e) {
-    clearInterval(connTimer);
+    if (connTimer) clearInterval(connTimer);
     resetConnectors();
     removeThinking();
     appendMsg('assistant', 'Connection error. Check your API key and network.');
