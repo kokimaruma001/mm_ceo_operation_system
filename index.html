@@ -759,7 +759,7 @@ function setConnectorActive(serverName, active) {
 }
 
 function resetConnectors() {
-  const label = IS_CLAUDE_AI ? 'Ready' : 'claude.ai only';
+  const label = 'Connected via backend';
   Object.values(CONNECTOR_META).forEach(meta => {
     const dot = document.getElementById(meta.dotId);
     const status = document.getElementById(meta.statusId);
