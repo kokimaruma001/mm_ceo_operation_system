@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Marker Media">
+<meta name="theme-color" content="#0a0905">
+<title>Marker Media — CEO Operating System</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0905;
+    --surface: #111009;
+    --surface2: #181610;
+    --border: #2a2618;
+    --border-light: #3a3420;
+    --gold: #c9a84c;
+    --gold-dim: #8a6f2e;
+    --gold-subtle: #2a2010;
+    --cream: #e8dfc8;
+    --cream-dim: #9a9078;
+    --text: #d4c9a8;
+    --text-dim: #6a6050;
+    --red: #c44f3a;
+    --green: #5a8a5a;
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.7;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* KEY GATE */
+  .key-gate {
+    position: fixed; inset: 0;
+    background: var(--bg);
+    z-index: 200;
+    display: flex; align-items: center; justify-content: center;
+    padding: 32px;
+  }
+  .key-card {
+    width: 100%; max-width: 440px;
+    border: 1px solid var(--border-light);
+    padding: 40px 36px;
+    background: var(--surface);
+  }
+  .key-card-title { font-family: var(--font-display); font-size: 26px; font-weight: 300; letter-spacing: 0.08em; color: var(--cream); margin-bottom: 6px; }
+  .key-card-sub { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold-dim); margin-bottom: 28px; }
+  .key-label { font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 8px; display: block; }
+  .key-input { width: 100%; background: var(--surface2); border: 1px solid var(--border-light); border-radius: 2px; padding: 12px 16px; font-family: var(--font-mono); font-size: 13px; color: var(--cream); outline: none; transition: border-color 0.2s; }
+  .key-input:focus { border-color: var(--gold-dim); }
+  .key-input::placeholder { color: var(--text-dim); }
+  .key-hint { font-size: 11px; color: var(--text-dim); margin-top: 10px; line-height: 1.6; }
+  .key-hint a { color: var(--gold-dim); text-decoration: none; }
+  .key-hint a:hover { color: var(--gold); }
+  .key-btn { width: 100%; margin-top: 20px; background: var(--gold-subtle); border: 1px solid var(--gold-dim); color: var(--gold); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; padding: 14px; cursor: pointer; border-radius: 2px; transition: all 0.2s; }
+  .key-btn:hover { background: rgba(201,168,76,0.15); border-color: var(--gold); color: var(--cream); }
+  .key-error { font-size: 11px; color: var(--red); margin-top: 10px; display: none; }
+
+  /* NOTIF BANNER */
+  .notif-banner {
+    position: fixed; top: 0; left: 0; right: 0;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--gold-dim);
+    padding: 11px 28px;
+    display: none; align-items: center; justify-content: space-between;
+    z-index: 150; gap: 16px;
+    animation: slideDown 0.3s ease;
+  }
+  @keyframes slideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
+  .notif-banner.show { display: flex; }
+  .notif-text { font-size: 12px; color: var(--cream); }
+  .notif-text strong { color: var(--gold); }
+  .notif-actions { display: flex; gap: 10px; flex-shrink: 0; }
+  .notif-btn { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; padding: 6px 12px; border-radius: 2px; cursor: pointer; border: 1px solid; transition: all 0.2s; background: none; }
+  .notif-btn.primary { border-color: var(--gold-dim); color: var(--gold); background: var(--gold-subtle); }
+  .notif-btn.primary:hover { background: rgba(201,168,76,0.2); }
+  .notif-btn.dismiss { border-color: var(--border-light); color: var(--text-dim); }
+  .notif-btn.dismiss:hover { color: var(--cream); }
+
+  /* HEADER */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 18px 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 20px; flex-shrink: 0;
+  }
+  .header-left { display: flex; align-items: center; gap: 16px; }
+  .history-toggle { background: none; border: 1px solid var(--border-light); border-radius: 2px; color: var(--text-dim); font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; padding: 6px 12px; cursor: pointer; transition: all 0.2s; }
+  .history-toggle:hover { border-color: var(--gold-dim); color: var(--gold); }
+  .brand-name { font-family: var(--font-display); font-size: 22px; font-weight: 300; letter-spacing: 0.18em; color: var(--cream); text-transform: uppercase; }
+  .brand-sub { font-size: 10px; letter-spacing: 0.3em; color: var(--gold); text-transform: uppercase; margin-top: 2px; }
+  .header-right { display: flex; align-items: center; gap: 14px; }
+  .header-date { font-family: var(--font-display); font-size: 13px; font-style: italic; color: var(--cream-dim); }
+  .icon-btn { background: none; border: 1px solid var(--border); border-radius: 2px; color: var(--text-dim); font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; padding: 6px 10px; cursor: pointer; transition: all 0.2s; }
+  .icon-btn:hover { border-color: var(--gold-dim); color: var(--gold-dim); }
+
+  /* STATUS BAR */
+  .status-bar {
+    background: var(--gold-subtle); border-bottom: 1px solid var(--gold-dim);
+    padding: 7px 32px;
+    display: flex; align-items: center; gap: 18px;
+    font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--gold-dim); flex-shrink: 0;
+  }
+  .status-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--gold-dim); display: inline-block; margin-right: 5px; }
+  .status-dot.active { background: var(--gold); box-shadow: 0 0 6px var(--gold); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+  .status-right { margin-left: auto; display: flex; gap: 18px; align-items: center; }
+  .streak-badge { border: 1px solid var(--gold-dim); padding: 2px 8px; font-size: 9px; letter-spacing: 0.15em; color: var(--gold); }
+
+  /* APP BODY */
+  .app-body { flex: 1; display: flex; overflow: hidden; position: relative; }
+
+  /* HISTORY DRAWER */
+  .history-drawer {
+    width: 252px; flex-shrink: 0;
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    background: var(--surface);
+    transform: translateX(-100%);
+    position: absolute; top: 0; left: 0; bottom: 0;
+    z-index: 10;
+    transition: transform 0.25s ease;
+  }
+  .history-drawer.open { transform: translateX(0); }
+  .drawer-header { padding: 14px 20px; border-bottom: 1px solid var(--border); font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--text-dim); display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .drawer-header::before { content: ''; width: 14px; height: 1px; background: var(--gold); flex-shrink: 0; }
+  .session-list { flex: 1; overflow-y: auto; padding: 6px 0; }
+  .session-list::-webkit-scrollbar { width: 2px; }
+  .session-list::-webkit-scrollbar-thumb { background: var(--border-light); }
+  .session-item { padding: 11px 20px; cursor: pointer; border-bottom: 1px solid var(--border); transition: background 0.15s; display: flex; flex-direction: column; gap: 3px; }
+  .session-item:hover { background: var(--surface2); }
+  .session-item.active { border-left: 2px solid var(--gold-dim); background: var(--gold-subtle); }
+  .session-date { font-size: 11px; color: var(--cream-dim); }
+  .session-preview { font-size: 10px; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .session-count { font-size: 9px; color: var(--text-dim); letter-spacing: 0.1em; }
+  .new-session-btn { margin: 12px 16px; padding: 9px; background: none; border: 1px solid var(--border-light); border-radius: 2px; color: var(--text-dim); font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
+  .new-session-btn:hover { border-color: var(--gold-dim); color: var(--gold); }
+
+  /* MAIN CONTENT */
+  .main-content { flex: 1; display: grid; grid-template-columns: 1fr 310px; overflow: hidden; transition: margin-left 0.25s ease; }
+  .main-content.drawer-open { margin-left: 252px; }
+
+  /* CHAT PANEL */
+  .chat-panel { display: flex; flex-direction: column; border-right: 1px solid var(--border); overflow: hidden; }
+  .panel-label { padding: 11px 28px; border-bottom: 1px solid var(--border); font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--text-dim); display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .panel-label::before { content: ''; width: 14px; height: 1px; background: var(--gold); flex-shrink: 0; }
+  .readonly-banner { background: rgba(196,79,58,0.08); border-bottom: 1px solid rgba(196,79,58,0.2); padding: 8px 28px; font-size: 11px; color: var(--red); display: none; align-items: center; justify-content: space-between; flex-shrink: 0; }
+  .readonly-banner.show { display: flex; }
+  .resume-btn { background: none; border: 1px solid var(--red); color: var(--red); font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; padding: 4px 10px; cursor: pointer; border-radius: 2px; transition: all 0.2s; }
+  .resume-btn:hover { background: rgba(196,79,58,0.1); }
+
+  .messages { flex: 1; overflow-y: auto; padding: 24px 28px; display: flex; flex-direction: column; gap: 22px; scroll-behavior: smooth; }
+  .messages::-webkit-scrollbar { width: 3px; }
+  .messages::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 2px; }
+
+  .msg { display: flex; flex-direction: column; gap: 6px; animation: fadeUp 0.35s ease both; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .msg-role { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; }
+  .msg.user .msg-role { color: var(--gold-dim); }
+  .msg.assistant .msg-role { color: var(--cream-dim); }
+  .msg-body { padding: 14px 18px; border-radius: 2px; line-height: 1.85; font-size: 13px; }
+  .msg.user .msg-body { background: var(--gold-subtle); border-left: 2px solid var(--gold-dim); color: var(--cream); }
+  .msg.assistant .msg-body { background: var(--surface); border-left: 2px solid var(--border-light); color: var(--text); }
+
+  .thinking { display: flex; align-items: center; gap: 12px; padding: 14px 18px; background: var(--surface); border-left: 2px solid var(--border-light); border-radius: 2px; color: var(--text-dim); font-size: 11px; letter-spacing: 0.08em; }
+  .thinking-dots span { display: inline-block; width: 4px; height: 4px; border-radius: 50%; background: var(--gold-dim); margin: 0 2px; animation: dot-bounce 1.4s infinite ease-in-out both; }
+  .thinking-dots span:nth-child(1) { animation-delay: 0s; }
+  .thinking-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .thinking-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes dot-bounce { 0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
+
+  .welcome-msg { padding: 20px 18px; border-left: 2px solid var(--gold-dim); background: linear-gradient(135deg, var(--surface), var(--gold-subtle)); }
+  .welcome-title { font-family: var(--font-display); font-size: 18px; font-weight: 300; color: var(--cream); margin-bottom: 8px; }
+  .welcome-body { font-size: 12px; color: var(--text); line-height: 1.85; }
+  .divider-line { width: 32px; height: 1px; background: var(--gold-dim); margin: 10px 0; }
+
+  /* INPUT */
+  .input-area { border-top: 1px solid var(--border); padding: 14px 28px; display: flex; gap: 10px; align-items: flex-end; flex-shrink: 0; }
+  textarea { flex: 1; background: var(--surface2); border: 1px solid var(--border-light); border-radius: 2px; padding: 10px 14px; font-family: var(--font-mono); font-size: 13px; color: var(--cream); resize: none; min-height: 44px; max-height: 130px; outline: none; transition: border-color 0.2s; line-height: 1.6; }
+  textarea::placeholder { color: var(--text-dim); }
+  textarea:focus { border-color: var(--gold-dim); }
+  textarea:disabled { opacity: 0.35; cursor: not-allowed; }
+  .send-btn { background: var(--gold-subtle); border: 1px solid var(--gold-dim); color: var(--gold); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; padding: 0 16px; cursor: pointer; border-radius: 2px; transition: all 0.2s; flex-shrink: 0; height: 44px; }
+  .send-btn:hover:not(:disabled) { background: rgba(201,168,76,0.15); border-color: var(--gold); color: var(--cream); }
+  .send-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  /* RIGHT PANEL */
+  .right-panel { display: flex; flex-direction: column; overflow: hidden; }
+  .action-board { padding: 14px 18px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+  .action-empty { font-size: 11px; color: var(--text-dim); font-style: italic; padding: 3px 0; }
+  .action-item { padding: 8px 0; border-bottom: 1px solid var(--border); display: flex; gap: 10px; align-items: flex-start; animation: fadeUp 0.35s ease both; }
+  .action-item:last-child { border-bottom: none; }
+  .action-num { width: 17px; height: 17px; border: 1px solid var(--border-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; color: var(--text-dim); flex-shrink: 0; margin-top: 2px; }
+  .action-text { font-size: 11px; color: var(--cream); line-height: 1.5; }
+  .action-tag { font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; padding: 1px 5px; border: 1px solid; margin-top: 4px; display: inline-block; }
+  .tag-priority { border-color: var(--border-light); color: var(--text-dim); }
+  .tag-rev { border-color: var(--gold-dim); color: var(--gold); }
+  .tag-strat { border-color: #4a6060; color: #7ab0a8; }
+
+  .metrics-board { padding: 14px 18px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+  .metric-row { display: flex; justify-content: space-between; align-items: baseline; padding: 6px 0; border-bottom: 1px solid var(--border); }
+  .metric-row:last-child { border-bottom: none; }
+  .metric-label { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-dim); }
+  .metric-val { font-family: var(--font-display); font-size: 15px; font-weight: 300; color: var(--gold); }
+
+  .quick-prompts { flex: 1; overflow-y: auto; padding: 10px 14px; }
+  .quick-prompts::-webkit-scrollbar { width: 2px; }
+  .quick-prompts::-webkit-scrollbar-thumb { background: var(--border-light); }
+  .prompt-btn { display: block; width: 100%; text-align: left; background: none; border: 1px solid var(--border); border-radius: 2px; padding: 9px 11px; font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); cursor: pointer; margin-bottom: 6px; transition: all 0.2s; line-height: 1.5; }
+  .prompt-btn:hover { border-color: var(--gold-dim); color: var(--cream); background: var(--gold-subtle); }
+
+  /* SETTINGS MODAL */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(10,9,5,0.88); z-index: 180; display: none; align-items: center; justify-content: center; padding: 32px; }
+  .modal-overlay.show { display: flex; }
+  .modal { background: var(--surface); border: 1px solid var(--border-light); padding: 32px; width: 100%; max-width: 400px; }
+  .modal-title { font-family: var(--font-display); font-size: 20px; font-weight: 300; color: var(--cream); margin-bottom: 22px; letter-spacing: 0.06em; }
+  .modal-field { margin-bottom: 18px; }
+  .modal-label { display: block; font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 7px; }
+  .modal-input { width: 100%; background: var(--surface2); border: 1px solid var(--border-light); border-radius: 2px; padding: 10px 14px; font-family: var(--font-mono); font-size: 13px; color: var(--cream); outline: none; transition: border-color 0.2s; }
+  .modal-input:focus { border-color: var(--gold-dim); }
+  .modal-hint { font-size: 11px; color: var(--text-dim); margin-top: 7px; line-height: 1.6; }
+  .modal-hint a { color: var(--gold-dim); text-decoration: none; }
+  .modal-hint a:hover { color: var(--gold); }
+  .modal-actions { display: flex; gap: 10px; margin-top: 22px; }
+  .modal-btn { flex: 1; padding: 11px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; border-radius: 2px; cursor: pointer; border: 1px solid; transition: all 0.2s; }
+  .modal-btn.primary { background: var(--gold-subtle); border-color: var(--gold-dim); color: var(--gold); }
+  .modal-btn.primary:hover { background: rgba(201,168,76,0.15); border-color: var(--gold); color: var(--cream); }
+  .modal-btn.secondary { background: none; border-color: var(--border-light); color: var(--text-dim); }
+  .modal-btn.secondary:hover { color: var(--cream); }
+  .notif-status { font-size: 11px; padding: 8px 10px; border-radius: 2px; margin-top: 8px; display: none; }
+  .notif-status.granted { background: rgba(90,138,90,0.12); color: #7ab87a; border: 1px solid rgba(90,138,90,0.3); display: block; }
+  .notif-status.denied { background: rgba(196,79,58,0.1); color: var(--red); border: 1px solid rgba(196,79,58,0.2); display: block; }
+
+  @media (max-width: 768px) {
+    .main-content { grid-template-columns: 1fr; }
+    .right-panel { display: none; }
+    header { padding: 14px 18px; }
+    .messages { padding: 16px; }
+    .input-area { padding: 12px 16px; }
+    .status-bar { padding: 7px 16px; gap: 12px; }
+    .main-content.drawer-open { margin-left: 0; }
+    .key-card { padding: 28px 22px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NOTIFICATION BANNER -->
+<div class="notif-banner" id="notif-banner">
+  <div class="notif-text"><strong>Check-In Reminder.</strong> You haven't checked in today yet.</div>
+  <div class="notif-actions">
+    <button class="notif-btn primary" onclick="dismissBanner(true)">Check In Now</button>
+    <button class="notif-btn dismiss" onclick="dismissBanner(false)">Later</button>
+  </div>
+</div>
+
+<!-- API KEY GATE -->
+<div class="key-gate" id="key-gate">
+  <div class="key-card">
+    <div class="key-card-title">Marker Media</div>
+    <div class="key-card-sub">CEO Operating System</div>
+    <label class="key-label" for="api-key-input">Anthropic API Key</label>
+    <input class="key-input" id="api-key-input" type="password" placeholder="sk-ant-..." autocomplete="off" onkeydown="if(event.key==='Enter') saveKey()" />
+    <div class="key-hint">
+      Get your key at <a href="https://console.anthropic.com/keys" target="_blank">console.anthropic.com/keys</a>.<br>
+      Stored locally on this device only. Never sent anywhere except Anthropic.
+    </div>
+    <div class="key-error" id="key-error">Invalid key. Should start with sk-ant-</div>
+    <button class="key-btn" onclick="saveKey()">Unlock System</button>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="settings-modal">
+  <div class="modal">
+    <div class="modal-title">Settings</div>
+    <div class="modal-field">
+      <label class="modal-label">Daily Reminder Time</label>
+      <input class="modal-input" type="time" id="notif-time" value="18:00" />
+      <div class="modal-hint">When you open the app after this time without checking in, a reminder banner appears at the top.</div>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Browser Notifications</label>
+      <button class="modal-btn primary" id="notif-perm-btn" onclick="requestNotifPermission()">Enable Notifications</button>
+      <div class="notif-status" id="notif-status"></div>
+      <div class="modal-hint" style="margin-top:8px;">
+        Fires a notification when you open the app past your reminder time. For true background alerts (app fully closed), you need a push service. A free option: <a href="https://ntfy.sh" target="_blank">ntfy.sh</a>.
+      </div>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">API Key</label>
+      <button class="modal-btn secondary" onclick="resetKey()">Change API Key</button>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn primary" onclick="saveSettings()">Save</button>
+      <button class="modal-btn secondary" onclick="closeSettings()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-left">
+    <button class="history-toggle" onclick="toggleDrawer()" id="drawer-toggle">History</button>
+    <div>
+      <div class="brand-name">Marker Media</div>
+      <div class="brand-sub">CEO Operating System</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="header-date" id="live-date"></div>
+    <button class="icon-btn" onclick="openSettings()">Settings</button>
+  </div>
+</header>
+
+<!-- STATUS BAR -->
+<div class="status-bar">
+  <span><span class="status-dot active" id="status-dot"></span><span id="status-text">System Online</span></span>
+  <span>R3,000 / shoot</span>
+  <div class="status-right">
+    <span id="session-label">Today</span>
+    <span class="streak-badge" id="streak-badge">Streak: 0</span>
+  </div>
+</div>
+
+<div class="app-body">
+  <!-- HISTORY DRAWER -->
+  <div class="history-drawer" id="history-drawer">
+    <div class="drawer-header">Session History</div>
+    <div class="session-list" id="session-list"></div>
+    <button class="new-session-btn" onclick="startToday()">+ Today's Check-In</button>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content" id="main-content">
+    <div class="chat-panel">
+      <div class="panel-label" id="chat-panel-label">Advisory Session</div>
+      <div class="readonly-banner" id="readonly-banner">
+        Viewing past session.
+        <button class="resume-btn" onclick="startToday()">Go to Today</button>
+      </div>
+      <div class="messages" id="messages"></div>
+      <div class="input-area">
+        <textarea id="user-input" placeholder="What did you work on today..." rows="1"
+          onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        <button class="send-btn" id="send-btn" onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+
+    <div class="right-panel">
+      <div class="panel-label">Priority Actions</div>
+      <div class="action-board" id="action-board">
+        <div class="action-empty">Actions appear after your check-in.</div>
+      </div>
+      <div class="panel-label">Metrics</div>
+      <div class="metrics-board">
+        <div class="metric-row">
+          <span class="metric-label">Current Rate</span>
+          <span class="metric-val">R3,000</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Target</span>
+          <span class="metric-val" style="font-size:12px;font-family:var(--font-mono);color:var(--cream-dim);">Luxury / Travel</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">Total Sessions</span>
+          <span class="metric-val" id="total-sessions" style="font-size:13px;font-family:var(--font-mono);">0</span>
+        </div>
+      </div>
+      <div class="panel-label">Quick Prompts</div>
+      <div class="quick-prompts">
+        <button class="prompt-btn" onclick="quickPrompt('I spent the day editing client photos and posting content. I reached out to one potential client but no reply.')">Editing + outreach, no results</button>
+        <button class="prompt-btn" onclick="quickPrompt('I landed a new booking today at R3000. The client found me on Instagram.')">Landed a R3,000 booking</button>
+        <button class="prompt-btn" onclick="quickPrompt('I did admin today. Updated my CRM, responded to emails, and planned my content calendar for next week.')">Admin and planning day</button>
+        <button class="prompt-btn" onclick="quickPrompt('I want to review my pricing strategy. I feel like I\'m undercharging but don\'t know how to move up.')">Review pricing strategy</button>
+        <button class="prompt-btn" onclick="quickPrompt('I shot a luxury property today for a real estate agency. They paid R3000. I want more high-end real estate work.')">Shot luxury property</button>
+        <button class="prompt-btn" onclick="quickPrompt('What are the highest-priority moves I should make this week to shift toward luxury and travel clients?')">Top moves this week</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SYSTEM_PROMPT = `You are a CEO advisor for Marker Media, a creative luxury photography and media company.
+
+Context:
+- Specializes in professional photography and visual media
+- Current rate: R3000 per shoot
+- Goal: Transition to luxury and travel-based clientele
+- Positioning: Premium storytelling, high-end brand identity
+- Focus: Systems, pricing increases, premium clients, scalable growth
+
+Your role in each check-in:
+1. DAILY CLARITY: Identify what moved the business forward vs busy work.
+2. REVENUE FOCUS: Push toward high-income activities. Challenge underpricing.
+3. STRATEGIC THINKING: Guide decisions like a CEO. Advise on positioning and client targeting.
+4. ACCOUNTABILITY: Call out procrastination or playing small.
+5. GROWTH: Identify scaling opportunities. Keep focus on premium, global brand building.
+
+If a previous session summary is included, reference it to check follow-through on yesterday's actions.
+
+At the end of EVERY response include this block exactly:
+
+---ACTIONS---
+PRIORITY_1: [action]
+PRIORITY_2: [action]
+PRIORITY_3: [action]
+REVENUE: [non-negotiable revenue action]
+STRATEGIC: [long-term strategic improvement]
+---END---
+
+Tone: Direct, sharp, no fluff. Speak like a high-level operator. Be concise but substantive.`;
+
+let API_KEY = '';
+let messages = [];
+let isLoading = false;
+let viewingDate = null;
+let drawerOpen = false;
+
+const todayKey = () => new Date().toISOString().split('T')[0];
+
+// STORAGE
+function saveSession(date, msgs, actions) {
+  const key = `mm_session_${date}`;
+  const existing = loadSession(date) || { date, messages: [], actions: null, preview: '' };
+  existing.messages = msgs;
+  if (actions) existing.actions = actions;
+  const firstUser = msgs.find(m => m.role === 'user');
+  if (firstUser) existing.preview = firstUser.content.slice(0, 60);
+  localStorage.setItem(key, JSON.stringify(existing));
+  let idx = JSON.parse(localStorage.getItem('mm_session_index') || '[]');
+  if (!idx.includes(date)) { idx.push(date); idx.sort((a,b) => b.localeCompare(a)); }
+  localStorage.setItem('mm_session_index', JSON.stringify(idx));
+}
+
+function loadSession(date) {
+  const raw = localStorage.getItem(`mm_session_${date}`);
+  return raw ? JSON.parse(raw) : null;
+}
+
+function getAllSessions() {
+  const idx = JSON.parse(localStorage.getItem('mm_session_index') || '[]');
+  return idx.map(d => loadSession(d)).filter(Boolean);
+}
+
+function getStreak() {
+  const idx = JSON.parse(localStorage.getItem('mm_session_index') || '[]');
+  if (!idx.length) return 0;
+  let streak = 0;
+  let check = new Date();
+  if (idx[0] !== todayKey()) check.setDate(check.getDate() - 1);
+  for (let i = 0; i < idx.length; i++) {
+    const expected = check.toISOString().split('T')[0];
+    if (idx[i] === expected) { streak++; check.setDate(check.getDate() - 1); }
+    else break;
+  }
+  return streak;
+}
+
+// INIT
+window.addEventListener('DOMContentLoaded', () => {
+  const now = new Date();
+  document.getElementById('live-date').textContent = now.toLocaleDateString('en-ZA', {
+    weekday: 'long', day: 'numeric', month: 'long'
+  });
+  const saved = localStorage.getItem('mm_api_key');
+  if (saved) { API_KEY = saved; document.getElementById('key-gate').style.display = 'none'; initApp(); }
+});
+
+function initApp() {
+  updateStreak();
+  renderSessionList();
+  loadTodayOrWelcome();
+  checkDailyReminder();
+  document.getElementById('total-sessions').textContent = getAllSessions().length;
+}
+
+function loadTodayOrWelcome() {
+  const session = loadSession(todayKey());
+  if (session && session.messages && session.messages.length > 0) {
+    messages = session.messages;
+    renderMessages(messages);
+    if (session.actions) updateActionBoard(session.actions);
+  } else {
+    messages = [];
+    renderMessages([]);
+  }
+  viewingDate = null;
+  setReadOnly(false);
+  document.getElementById('session-label').textContent = 'Today';
+}
+
+// KEY
+function saveKey() {
+  const input = document.getElementById('api-key-input').value.trim();
+  if (!input.startsWith('sk-')) { document.getElementById('key-error').style.display = 'block'; return; }
+  document.getElementById('key-error').style.display = 'none';
+  localStorage.setItem('mm_api_key', input);
+  API_KEY = input;
+  document.getElementById('key-gate').style.display = 'none';
+  initApp();
+}
+
+function resetKey() {
+  localStorage.removeItem('mm_api_key');
+  API_KEY = '';
+  document.getElementById('api-key-input').value = '';
+  closeSettings();
+  document.getElementById('key-gate').style.display = 'flex';
+}
+
+// DRAWER
+function toggleDrawer() {
+  drawerOpen = !drawerOpen;
+  document.getElementById('history-drawer').classList.toggle('open', drawerOpen);
+  document.getElementById('main-content').classList.toggle('drawer-open', drawerOpen);
+  document.getElementById('drawer-toggle').textContent = drawerOpen ? 'Close' : 'History';
+}
+
+function renderSessionList() {
+  const list = document.getElementById('session-list');
+  const sessions = getAllSessions();
+  list.innerHTML = '';
+  if (!sessions.length) {
+    list.innerHTML = '<div style="padding:14px 20px;font-size:11px;color:var(--text-dim);">No past sessions yet.</div>';
+    return;
+  }
+  sessions.forEach(s => {
+    const div = document.createElement('div');
+    const isToday = s.date === todayKey();
+    const current = viewingDate || todayKey();
+    div.className = 'session-item' + (s.date === current ? ' active' : '');
+    const msgCount = s.messages ? s.messages.filter(m => m.role === 'user').length : 0;
+    const dateStr = isToday ? 'Today' : fmtDate(s.date);
+    div.innerHTML = `<div class="session-date">${dateStr}</div>${s.preview ? `<div class="session-preview">${s.preview}...</div>` : ''}<div class="session-count">${msgCount} exchange${msgCount !== 1 ? 's' : ''}</div>`;
+    div.onclick = () => loadSessionView(s.date);
+    list.appendChild(div);
+  });
+}
+
+function fmtDate(d) {
+  return new Date(d + 'T12:00:00').toLocaleDateString('en-ZA', { weekday: 'short', day: 'numeric', month: 'short' });
+}
+
+function loadSessionView(date) {
+  const session = loadSession(date);
+  if (!session) return;
+  viewingDate = date;
+  messages = session.messages || [];
+  renderMessages(messages);
+  if (session.actions) updateActionBoard(session.actions);
+  const isToday = date === todayKey();
+  setReadOnly(!isToday);
+  document.getElementById('session-label').textContent = isToday ? 'Today' : fmtDate(date);
+  renderSessionList();
+}
+
+function startToday() {
+  viewingDate = null;
+  loadTodayOrWelcome();
+  renderSessionList();
+  if (drawerOpen) toggleDrawer();
+}
+
+function setReadOnly(ro) {
+  document.getElementById('readonly-banner').classList.toggle('show', ro);
+  document.getElementById('user-input').disabled = ro;
+  document.getElementById('send-btn').disabled = ro;
+}
+
+// RENDER
+function renderMessages(msgs) {
+  const c = document.getElementById('messages');
+  c.innerHTML = '';
+  if (!msgs.length) {
+    c.innerHTML = `<div class="msg assistant"><div class="msg-role">Advisor</div><div class="msg-body welcome-msg"><div class="welcome-title">Ready for your check-in.</div><div class="divider-line"></div><div class="welcome-body">Start with what you actually worked on today. Be specific. I'm here to separate what moved the business forward from what kept you busy.<br><br>The goal is always the same: premium clients, higher pricing, scalable systems.</div></div></div>`;
+    return;
+  }
+  msgs.forEach(m => appendMsg(m.role, m.content, false));
+  c.scrollTop = c.scrollHeight;
+}
+
+function appendMsg(role, content, animate = true) {
+  const c = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  if (!animate) div.style.animation = 'none';
+  const rl = document.createElement('div');
+  rl.className = 'msg-role';
+  rl.textContent = role === 'user' ? 'You' : 'Advisor';
+  const body = document.createElement('div');
+  body.className = 'msg-body';
+  if (role === 'assistant') {
+    const { clean, actions } = parseResp(content);
+    body.innerHTML = fmtText(clean);
+    if (actions) updateActionBoard(actions);
+  } else {
+    body.textContent = content;
+  }
+  div.appendChild(rl);
+  div.appendChild(body);
+  c.appendChild(div);
+  c.scrollTop = c.scrollHeight;
+}
+
+function parseResp(text) {
+  const m = text.match(/---ACTIONS---([\s\S]*?)---END---/);
+  if (!m) return { clean: text, actions: null };
+  const block = m[1].trim();
+  const clean = text.replace(/---ACTIONS---[\s\S]*?---END---/, '').trim();
+  const actions = {};
+  block.split('\n').forEach(l => {
+    if (l.startsWith('PRIORITY_1:')) actions.p1 = l.replace('PRIORITY_1:', '').trim();
+    if (l.startsWith('PRIORITY_2:')) actions.p2 = l.replace('PRIORITY_2:', '').trim();
+    if (l.startsWith('PRIORITY_3:')) actions.p3 = l.replace('PRIORITY_3:', '').trim();
+    if (l.startsWith('REVENUE:')) actions.revenue = l.replace('REVENUE:', '').trim();
+    if (l.startsWith('STRATEGIC:')) actions.strategic = l.replace('STRATEGIC:', '').trim();
+  });
+  return { clean, actions };
+}
+
+function fmtText(t) {
+  return t.replace(/\*\*(.*?)\*\*/g, '<strong style="color:var(--cream)">$1</strong>')
+          .replace(/\*(.*?)\*/g, '<em>$1</em>')
+          .replace(/\n\n/g, '</p><p style="margin-top:10px">')
+          .replace(/\n/g, '<br>');
+}
+
+function updateActionBoard(actions) {
+  const board = document.getElementById('action-board');
+  board.innerHTML = '';
+  [
+    { t: actions.p1, tag: 'Priority', cls: 'tag-priority', n: '1' },
+    { t: actions.p2, tag: 'Priority', cls: 'tag-priority', n: '2' },
+    { t: actions.p3, tag: 'Priority', cls: 'tag-priority', n: '3' },
+    { t: actions.revenue, tag: 'Revenue', cls: 'tag-rev', n: 'R' },
+    { t: actions.strategic, tag: 'Strategic', cls: 'tag-strat', n: 'S' },
+  ].forEach(item => {
+    if (!item.t) return;
+    const d = document.createElement('div');
+    d.className = 'action-item';
+    d.innerHTML = `<div class="action-num">${item.n}</div><div><div class="action-text">${item.t}</div><div class="action-tag ${item.cls}">${item.tag}</div></div>`;
+    board.appendChild(d);
+  });
+}
+
+function updateStreak() {
+  document.getElementById('streak-badge').textContent = `Streak: ${getStreak()}`;
+}
+
+// SEND
+async function sendMessage() {
+  if (isLoading || viewingDate) return;
+  const input = document.getElementById('user-input');
+  const text = input.value.trim();
+  if (!text) return;
+
+  input.value = ''; input.style.height = 'auto';
+  isLoading = true;
+  document.getElementById('send-btn').disabled = true;
+  document.getElementById('status-text').textContent = 'Processing';
+  document.getElementById('status-dot').classList.remove('active');
+
+  messages.push({ role: 'user', content: text });
+  appendMsg('user', text);
+  showThinking();
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': API_KEY,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: SYSTEM_PROMPT,
+        messages: buildCtx(messages)
+      })
+    });
+    const data = await res.json();
+    const reply = data.content?.[0]?.text || 'No response received.';
+    messages.push({ role: 'assistant', content: reply });
+    removeThinking();
+    appendMsg('assistant', reply);
+    const { actions } = parseResp(reply);
+    saveSession(todayKey(), messages, actions);
+    renderSessionList();
+    document.getElementById('total-sessions').textContent = getAllSessions().length;
+    updateStreak();
+  } catch(e) {
+    removeThinking();
+    appendMsg('assistant', 'Connection error. Check your API key and network.');
+  }
+
+  document.getElementById('status-text').textContent = 'System Online';
+  document.getElementById('status-dot').classList.add('active');
+  document.getElementById('send-btn').disabled = false;
+  isLoading = false;
+}
+
+function buildCtx(todayMsgs) {
+  // Inject yesterday's actions as context on first message of the day
+  if (todayMsgs.length !== 1) return todayMsgs;
+  const yDate = new Date();
+  yDate.setDate(yDate.getDate() - 1);
+  const ySession = loadSession(yDate.toISOString().split('T')[0]);
+  if (!ySession || !ySession.actions) return todayMsgs;
+  const a = ySession.actions;
+  return [
+    { role: 'user', content: `[Yesterday's actions: 1) ${a.p1||'N/A'} 2) ${a.p2||'N/A'} 3) ${a.p3||'N/A'} | Revenue: ${a.revenue||'N/A'} | Strategic: ${a.strategic||'N/A'}. Check my follow-through in today's brief.]` },
+    { role: 'assistant', content: "Understood. I have yesterday's priorities. Brief me on today." },
+    ...todayMsgs
+  ];
+}
+
+function showThinking() {
+  const c = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg assistant'; div.id = 'thinking-msg';
+  const rl = document.createElement('div'); rl.className = 'msg-role'; rl.textContent = 'Advisor';
+  const body = document.createElement('div'); body.className = 'thinking';
+  body.innerHTML = '<div class="thinking-dots"><span></span><span></span><span></span></div><span>Reviewing</span>';
+  div.appendChild(rl); div.appendChild(body); c.appendChild(div); c.scrollTop = c.scrollHeight;
+}
+
+function removeThinking() { const t = document.getElementById('thinking-msg'); if (t) t.remove(); }
+
+function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 130) + 'px'; }
+function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
+function quickPrompt(text) { if (viewingDate) return; document.getElementById('user-input').value = text; autoResize(document.getElementById('user-input')); sendMessage(); }
+
+// NOTIFICATIONS
+function checkDailyReminder() {
+  const session = loadSession(todayKey());
+  const checkedIn = session && session.messages && session.messages.filter(m => m.role === 'user').length > 0;
+  if (checkedIn) return;
+  const [h, m] = (localStorage.getItem('mm_notif_time') || '18:00').split(':').map(Number);
+  const now = new Date();
+  if (now.getHours() > h || (now.getHours() === h && now.getMinutes() >= m)) {
+    document.getElementById('notif-banner').classList.add('show');
+    if (Notification.permission === 'granted') {
+      new Notification('Marker Media CEO Check-In', { body: "Your daily check-in is waiting. What did you work on today?" });
+    }
+  } else {
+    const target = new Date(); target.setHours(h, m, 0, 0);
+    const delay = target - now;
+    if (delay > 0 && delay < 86400000) setTimeout(checkDailyReminder, delay);
+  }
+}
+
+function dismissBanner(checkin) {
+  document.getElementById('notif-banner').classList.remove('show');
+  if (checkin) { if (drawerOpen) toggleDrawer(); document.getElementById('user-input').focus(); }
+}
+
+async function requestNotifPermission() {
+  if (!('Notification' in window)) { updateNotifStatus('denied', 'Not supported in this browser.'); return; }
+  const result = await Notification.requestPermission();
+  if (result === 'granted') {
+    updateNotifStatus('granted', 'Enabled. You will be notified when the app is open past your reminder time.');
+    document.getElementById('notif-perm-btn').textContent = 'Notifications Enabled';
+  } else {
+    updateNotifStatus('denied', 'Blocked. Enable notifications for this site in your device settings.');
+  }
+}
+
+function updateNotifStatus(type, msg) {
+  const el = document.getElementById('notif-status'); el.className = 'notif-status ' + type; el.textContent = msg;
+}
+
+// SETTINGS
+function openSettings() {
+  const saved = localStorage.getItem('mm_notif_time');
+  if (saved) document.getElementById('notif-time').value = saved;
+  if (Notification.permission === 'granted') {
+    document.getElementById('notif-perm-btn').textContent = 'Notifications Enabled';
+    updateNotifStatus('granted', 'Notifications are currently enabled.');
+  } else if (Notification.permission === 'denied') {
+    document.getElementById('notif-perm-btn').textContent = 'Notifications Blocked';
+    updateNotifStatus('denied', 'Blocked in browser settings. Change this in your OS notification settings.');
+  }
+  document.getElementById('settings-modal').classList.add('show');
+}
+
+function closeSettings() { document.getElementById('settings-modal').classList.remove('show'); }
+function saveSettings() { const t = document.getElementById('notif-time').value; if (t) localStorage.setItem('mm_notif_time', t); closeSettings(); }
+</script>
+</body>
+</html>
