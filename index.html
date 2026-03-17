@@ -726,12 +726,13 @@ function updateStreak() {
 // MCP SERVERS
 // Connectors require Claude.ai OAuth session — disabled in standalone/mobile deployment
 const IS_CLAUDE_AI = window.location.hostname.includes('claude.ai');
-const MCP_SERVERS = IS_CLAUDE_AI ? [
+/*const MCP_SERVERS = IS_CLAUDE_AI ? [
   { type: 'url', url: 'https://gmail.mcp.claude.com/mcp',  name: 'gmail' },
   { type: 'url', url: 'https://gcal.mcp.claude.com/mcp',   name: 'google-calendar' },
   { type: 'url', url: 'https://mcp.notion.com/mcp',        name: 'notion' },
   { type: 'url', url: 'https://mcp.canva.com/mcp',         name: 'canva' }
-] : [];
+] : []; */
+const MCP_SERVERS = []; // fully disable Claude MCP 
 
 const CONNECTOR_META = {
   'gmail':           { label: 'Gmail',            dotId: 'dot-gmail',    statusId: 'status-gmail' },
@@ -770,87 +771,51 @@ function resetConnectors() {
 // SEND
 async function sendMessage() {
   if (isLoading || viewingDate) return;
+
   const input = document.getElementById('user-input');
   const text = input.value.trim();
   if (!text) return;
 
-  input.value = ''; input.style.height = 'auto';
+  input.value = '';
+  input.style.height = 'auto';
+
   isLoading = true;
   document.getElementById('send-btn').disabled = true;
-  document.getElementById('status-text').textContent = 'Connecting';
-  document.getElementById('status-dot').classList.remove('active');
-  resetConnectors();
 
   messages.push({ role: 'user', content: text });
   appendMsg('user', text);
-  showThinking(IS_CLAUDE_AI ? 'Pulling Gmail and Calendar' : 'Reviewing');
-
-  // Animate connectors sequentially (only in claude.ai where MCP is active)
-  const connSeq = ['gmail', 'google-calendar', 'notion'];
-  let ci = 0;
-  const connTimer = IS_CLAUDE_AI ? setInterval(() => {
-    if (ci > 0) setConnectorActive(connSeq[ci - 1], false);
-    if (ci < connSeq.length) { setConnectorActive(connSeq[ci], true); ci++; }
-    else clearInterval(connTimer);
-  }, 1800) : null;
+  showThinking('Analyzing your business...');
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch('http://localhost:3000/api/chat', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': API_KEY,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify(Object.assign({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 2000,
-        system: SYSTEM_PROMPT,
-        messages: buildCtx(messages)
-      }, MCP_SERVERS.length ? { mcp_servers: MCP_SERVERS } : {}))
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: buildCtx(messages) })
     });
 
-    if (connTimer) clearInterval(connTimer);
     const data = await res.json();
 
-    // Identify which tools were actually used
-    const toolsUsed = (data.content || [])
-      .filter(b => b.type === 'mcp_tool_use')
-      .map(b => b.server_name)
-      .filter((v, i, a) => a.indexOf(v) === i);
-
-    // Briefly show active state for each real tool used, then idle
-    toolsUsed.forEach((name, i) => {
-      setTimeout(() => setConnectorActive(name, true), i * 300);
-      setTimeout(() => setConnectorActive(name, false), i * 300 + 800);
-    });
-
-    // Extract text
     const reply = (data.content || [])
       .filter(b => b.type === 'text')
       .map(b => b.text)
-      .join('\n\n')
-      .trim() || 'No response received.';
+      .join('\n\n') || 'No response received.';
 
     messages.push({ role: 'assistant', content: reply });
+
     removeThinking();
-    appendMsg('assistant', reply, true, toolsUsed);
+    appendMsg('assistant', reply, true, data.tools_used || []);
+
     const { actions } = parseResp(reply);
     saveSession(todayKey(), messages, actions);
+
     renderSessionList();
-    document.getElementById('total-sessions').textContent = getAllSessions().length;
     updateStreak();
-  } catch(e) {
-    if (connTimer) clearInterval(connTimer);
-    resetConnectors();
+
+  } catch (e) {
     removeThinking();
-    appendMsg('assistant', 'Connection error. Check your API key and network.');
+    appendMsg('assistant', 'Server error. Make sure backend is running.');
   }
 
-  setTimeout(resetConnectors, 3000);
-  document.getElementById('status-text').textContent = 'System Online';
-  document.getElementById('status-dot').classList.add('active');
   document.getElementById('send-btn').disabled = false;
   isLoading = false;
 }
