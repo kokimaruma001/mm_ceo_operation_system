@@ -244,6 +244,21 @@
   .notif-status.granted { background: rgba(90,138,90,0.12); color: #7ab87a; border: 1px solid rgba(90,138,90,0.3); display: block; }
   .notif-status.denied { background: rgba(196,79,58,0.1); color: var(--red); border: 1px solid rgba(196,79,58,0.2); display: block; }
 
+  /* CONNECTORS PANEL */
+  .connectors-board { padding: 14px 18px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+  .connector-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--border); }
+  .connector-row:last-child { border-bottom: none; }
+  .connector-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 5px var(--green); flex-shrink: 0; }
+  .connector-dot.active { background: var(--gold); box-shadow: 0 0 8px var(--gold); animation: pulse 0.8s infinite; }
+  .connector-name { font-size: 11px; color: var(--cream-dim); flex: 1; }
+  .connector-status { font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); }
+  .connector-status.live { color: var(--gold); }
+
+  /* TOOL CHIPS */
+  .tool-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+  .tool-chip { font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; padding: 2px 7px; border-radius: 2px; border: 1px solid var(--border-light); color: var(--text-dim); display: flex; align-items: center; gap: 4px; }
+  .tool-chip::before { content: ''; width: 4px; height: 4px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+
   @media (max-width: 768px) {
     .main-content { grid-template-columns: 1fr; }
     .right-panel { display: none; }
@@ -380,13 +395,38 @@
           <span class="metric-val" id="total-sessions" style="font-size:13px;font-family:var(--font-mono);">0</span>
         </div>
       </div>
+      <div class="panel-label">Connectors</div>
+      <div class="connectors-board" id="connectors-board">
+        <div class="connector-row" id="conn-gmail">
+          <div class="connector-dot" id="dot-gmail"></div>
+          <div class="connector-name">Gmail</div>
+          <div class="connector-status" id="status-gmail">Ready</div>
+        </div>
+        <div class="connector-row" id="conn-gcal">
+          <div class="connector-dot" id="dot-gcal"></div>
+          <div class="connector-name">Google Calendar</div>
+          <div class="connector-status" id="status-gcal">Ready</div>
+        </div>
+        <div class="connector-row" id="conn-notion">
+          <div class="connector-dot" id="dot-notion"></div>
+          <div class="connector-name">Notion</div>
+          <div class="connector-status" id="status-notion">Ready</div>
+        </div>
+        <div class="connector-row" id="conn-canva">
+          <div class="connector-dot" id="dot-canva"></div>
+          <div class="connector-name">Canva</div>
+          <div class="connector-status" id="status-canva">Ready</div>
+        </div>
+      </div>
+
       <div class="panel-label">Quick Prompts</div>
       <div class="quick-prompts">
-        <button class="prompt-btn" onclick="quickPrompt('I spent the day editing client photos and posting content. I reached out to one potential client but no reply.')">Editing + outreach, no results</button>
+        <button class="prompt-btn" onclick="quickPrompt('Check my Gmail for any unanswered leads or client enquiries, then brief me on today.')">Scan inbox for leads</button>
+        <button class="prompt-btn" onclick="quickPrompt('Check my calendar for this week and tell me what shoots and meetings I have coming up, then advise on priorities.')">Review this week\'s schedule</button>
         <button class="prompt-btn" onclick="quickPrompt('I landed a new booking today at R3000. The client found me on Instagram.')">Landed a R3,000 booking</button>
-        <button class="prompt-btn" onclick="quickPrompt('I did admin today. Updated my CRM, responded to emails, and planned my content calendar for next week.')">Admin and planning day</button>
-        <button class="prompt-btn" onclick="quickPrompt('I want to review my pricing strategy. I feel like I\'m undercharging but don\'t know how to move up.')">Review pricing strategy</button>
-        <button class="prompt-btn" onclick="quickPrompt('I shot a luxury property today for a real estate agency. They paid R3000. I want more high-end real estate work.')">Shot luxury property</button>
+        <button class="prompt-btn" onclick="quickPrompt('I spent the day editing client photos and posting content. I reached out to one potential client but no reply.')">Editing + outreach day</button>
+        <button class="prompt-btn" onclick="quickPrompt('Review my pricing strategy. I feel like I\'m undercharging but don\'t know how to move up.')">Review pricing strategy</button>
+        <button class="prompt-btn" onclick="quickPrompt('Create a one-page strategy brief in Canva summarising my current positioning and top three growth moves.')">Make a strategy brief in Canva</button>
         <button class="prompt-btn" onclick="quickPrompt('What are the highest-priority moves I should make this week to shift toward luxury and travel clients?')">Top moves this week</button>
       </div>
     </div>
@@ -403,11 +443,20 @@ Context:
 - Positioning: Premium storytelling, high-end brand identity
 - Focus: Systems, pricing increases, premium clients, scalable growth
 
+You have access to the following tools. Use them proactively at the start of every check-in to build real context before responding — do not wait to be asked:
+
+- Gmail: Scan today's emails for unanswered leads, new client enquiries, pending follow-ups, or anything revenue-relevant. Summarise what you find.
+- Google Calendar: Check today's and tomorrow's schedule. Note actual shoots, meetings, or gaps. Cross-reference what the user reports against what was actually booked.
+- Notion: Look for any task lists, CRM entries, or project notes relevant to the check-in. If priority actions from past sessions exist there, check them for completion.
+- Canva: Use if the user needs a deliverable created from the session, such as a strategy brief, client proposal, or one-pager.
+
+At the start of each check-in, always query Gmail and Google Calendar first. Mention specifically what you found — unanswered emails, missed opportunities, upcoming shoots. This is real intelligence, not filler.
+
 Your role in each check-in:
-1. DAILY CLARITY: Identify what moved the business forward vs busy work.
-2. REVENUE FOCUS: Push toward high-income activities. Challenge underpricing.
+1. DAILY CLARITY: Use real data from Gmail and Calendar to assess the day, not just what the user reports.
+2. REVENUE FOCUS: Push toward high-income activities. Call out unanswered leads from Gmail by name if found.
 3. STRATEGIC THINKING: Guide decisions like a CEO. Advise on positioning and client targeting.
-4. ACCOUNTABILITY: Call out procrastination or playing small.
+4. ACCOUNTABILITY: Cross-reference Calendar bookings with what the user claims was done. Call out gaps.
 5. GROWTH: Identify scaling opportunities. Keep focus on premium, global brand building.
 
 If a previous session summary is included, reference it to check follow-through on yesterday's actions.
@@ -593,7 +642,7 @@ function renderMessages(msgs) {
   c.scrollTop = c.scrollHeight;
 }
 
-function appendMsg(role, content, animate = true) {
+function appendMsg(role, content, animate = true, toolsUsed = []) {
   const c = document.getElementById('messages');
   const div = document.createElement('div');
   div.className = `msg ${role}`;
@@ -607,6 +656,19 @@ function appendMsg(role, content, animate = true) {
     const { clean, actions } = parseResp(content);
     body.innerHTML = fmtText(clean);
     if (actions) updateActionBoard(actions);
+    // Render tool chips if tools were used
+    if (toolsUsed.length) {
+      const chips = document.createElement('div');
+      chips.className = 'tool-chips';
+      toolsUsed.forEach(name => {
+        const meta = CONNECTOR_META[name];
+        const chip = document.createElement('div');
+        chip.className = 'tool-chip';
+        chip.textContent = meta ? meta.label : name;
+        chips.appendChild(chip);
+      });
+      body.appendChild(chips);
+    }
   } else {
     body.textContent = content;
   }
@@ -661,6 +723,47 @@ function updateStreak() {
   document.getElementById('streak-badge').textContent = `Streak: ${getStreak()}`;
 }
 
+// MCP SERVERS
+const MCP_SERVERS = [
+  { type: 'url', url: 'https://gmail.mcp.claude.com/mcp',  name: 'gmail' },
+  { type: 'url', url: 'https://gcal.mcp.claude.com/mcp',   name: 'google-calendar' },
+  { type: 'url', url: 'https://mcp.notion.com/mcp',        name: 'notion' },
+  { type: 'url', url: 'https://mcp.canva.com/mcp',         name: 'canva' }
+];
+
+const CONNECTOR_META = {
+  'gmail':           { label: 'Gmail',            dotId: 'dot-gmail',    statusId: 'status-gmail' },
+  'google-calendar': { label: 'Calendar',         dotId: 'dot-gcal',     statusId: 'status-gcal' },
+  'notion':          { label: 'Notion',           dotId: 'dot-notion',   statusId: 'status-notion' },
+  'canva':           { label: 'Canva',            dotId: 'dot-canva',    statusId: 'status-canva' },
+};
+
+function setConnectorActive(serverName, active) {
+  const meta = CONNECTOR_META[serverName];
+  if (!meta) return;
+  const dot = document.getElementById(meta.dotId);
+  const status = document.getElementById(meta.statusId);
+  if (!dot || !status) return;
+  if (active) {
+    dot.classList.add('active');
+    status.textContent = 'Reading';
+    status.classList.add('live');
+  } else {
+    dot.classList.remove('active');
+    status.textContent = 'Done';
+    status.classList.remove('live');
+  }
+}
+
+function resetConnectors() {
+  Object.values(CONNECTOR_META).forEach(meta => {
+    const dot = document.getElementById(meta.dotId);
+    const status = document.getElementById(meta.statusId);
+    if (dot) dot.classList.remove('active');
+    if (status) { status.textContent = 'Ready'; status.classList.remove('live'); }
+  });
+}
+
 // SEND
 async function sendMessage() {
   if (isLoading || viewingDate) return;
@@ -671,12 +774,22 @@ async function sendMessage() {
   input.value = ''; input.style.height = 'auto';
   isLoading = true;
   document.getElementById('send-btn').disabled = true;
-  document.getElementById('status-text').textContent = 'Processing';
+  document.getElementById('status-text').textContent = 'Connecting';
   document.getElementById('status-dot').classList.remove('active');
+  resetConnectors();
 
   messages.push({ role: 'user', content: text });
   appendMsg('user', text);
-  showThinking();
+  showThinking('Pulling Gmail and Calendar');
+
+  // Animate connectors sequentially to reflect tool polling
+  const connSeq = ['gmail', 'google-calendar', 'notion'];
+  let ci = 0;
+  const connTimer = setInterval(() => {
+    if (ci > 0) setConnectorActive(connSeq[ci - 1], false);
+    if (ci < connSeq.length) { setConnectorActive(connSeq[ci], true); ci++; }
+    else clearInterval(connTimer);
+  }, 1800);
 
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
@@ -689,26 +802,51 @@ async function sendMessage() {
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
+        max_tokens: 2000,
         system: SYSTEM_PROMPT,
-        messages: buildCtx(messages)
+        messages: buildCtx(messages),
+        mcp_servers: MCP_SERVERS
       })
     });
+
+    clearInterval(connTimer);
     const data = await res.json();
-    const reply = data.content?.[0]?.text || 'No response received.';
+
+    // Identify which tools were actually used
+    const toolsUsed = (data.content || [])
+      .filter(b => b.type === 'mcp_tool_use')
+      .map(b => b.server_name)
+      .filter((v, i, a) => a.indexOf(v) === i);
+
+    // Briefly show active state for each real tool used, then idle
+    toolsUsed.forEach((name, i) => {
+      setTimeout(() => setConnectorActive(name, true), i * 300);
+      setTimeout(() => setConnectorActive(name, false), i * 300 + 800);
+    });
+
+    // Extract text
+    const reply = (data.content || [])
+      .filter(b => b.type === 'text')
+      .map(b => b.text)
+      .join('\n\n')
+      .trim() || 'No response received.';
+
     messages.push({ role: 'assistant', content: reply });
     removeThinking();
-    appendMsg('assistant', reply);
+    appendMsg('assistant', reply, true, toolsUsed);
     const { actions } = parseResp(reply);
     saveSession(todayKey(), messages, actions);
     renderSessionList();
     document.getElementById('total-sessions').textContent = getAllSessions().length;
     updateStreak();
   } catch(e) {
+    clearInterval(connTimer);
+    resetConnectors();
     removeThinking();
     appendMsg('assistant', 'Connection error. Check your API key and network.');
   }
 
+  setTimeout(resetConnectors, 3000);
   document.getElementById('status-text').textContent = 'System Online';
   document.getElementById('status-dot').classList.add('active');
   document.getElementById('send-btn').disabled = false;
@@ -730,14 +868,19 @@ function buildCtx(todayMsgs) {
   ];
 }
 
-function showThinking() {
+function showThinking(label = 'Reviewing') {
   const c = document.getElementById('messages');
   const div = document.createElement('div');
   div.className = 'msg assistant'; div.id = 'thinking-msg';
   const rl = document.createElement('div'); rl.className = 'msg-role'; rl.textContent = 'Advisor';
   const body = document.createElement('div'); body.className = 'thinking';
-  body.innerHTML = '<div class="thinking-dots"><span></span><span></span><span></span></div><span>Reviewing</span>';
+  body.innerHTML = `<div class="thinking-dots"><span></span><span></span><span></span></div><span id="thinking-label">${label}</span>`;
   div.appendChild(rl); div.appendChild(body); c.appendChild(div); c.scrollTop = c.scrollHeight;
+}
+
+function updateThinking(label) {
+  const el = document.getElementById('thinking-label');
+  if (el) el.textContent = label;
 }
 
 function removeThinking() { const t = document.getElementById('thinking-msg'); if (t) t.remove(); }
