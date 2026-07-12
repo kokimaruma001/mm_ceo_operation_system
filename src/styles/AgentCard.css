@@ -1,127 +1,76 @@
 .agent-card {
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(10px);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-lg);
-  text-align: center;
-  cursor: pointer;
-  transition: var(--transition-bounce);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08),
-              inset 0 1px 1px rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  border-left: 3px solid var(--accent-color);
   position: relative;
   overflow: hidden;
-  animation: cardAppear 0.5s ease-out;
+  padding: var(--spacing-lg);
+  background: linear-gradient(180deg, rgba(6, 16, 30, 0.95), rgba(10, 22, 39, 0.95));
+  border: 1px solid rgba(77, 211, 255, 0.14);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 22px 50px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  transition: var(--transition-smooth);
 }
 
 .agent-card::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, var(--accent-color) 0%, transparent 100%);
+  inset: 0;
+  background: linear-gradient(135deg, rgba(77, 211, 255, 0.14), transparent 60%);
   opacity: 0;
-  transition: opacity 0.3s ease;
-  z-index: 0;
-}
-
-.agent-card::after {
-  content: '';
-  position: absolute;
-  top: -50%;
-  right: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(201, 169, 110, 0.2) 0%, transparent 70%);
-  opacity: 0;
-  transition: var(--transition);
-  z-index: 0;
+  transition: opacity 0.35s ease;
 }
 
 .agent-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15),
-              inset 0 1px 1px rgba(255, 255, 255, 0.6);
-  border-left-width: 4px;
+  transform: translateY(-6px);
+  border-color: rgba(77, 211, 255, 0.28);
+  box-shadow: 0 32px 70px rgba(0, 0, 0, 0.45);
 }
 
 .agent-card:hover::before {
-  opacity: 0.08;
-}
-
-.agent-card:hover::after {
   opacity: 1;
 }
 
-@keyframes cardAppear {
-  from {
-    opacity: 0;
-    transform: translateY(20px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
 .agent-icon {
-  font-size: 40px;
-  color: var(--accent-color);
-  margin-bottom: var(--spacing-md);
-  position: relative;
-  z-index: 1;
-  transition: var(--transition-bounce);
-  display: inline-block;
+  font-size: 38px;
+  color: var(--color-accent);
   width: 60px;
   height: 60px;
-  background: linear-gradient(135deg, rgba(201, 169, 110, 0.1) 0%, rgba(201, 169, 110, 0.05) 100%);
-  border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 14px;
+  background: rgba(77, 211, 255, 0.08);
+  margin: 0 auto var(--spacing-md);
+  transition: transform 0.35s ease;
 }
 
 .agent-card:hover .agent-icon {
-  transform: scale(1.15) rotate(5deg);
-  background: linear-gradient(135deg, rgba(201, 169, 110, 0.15) 0%, rgba(201, 169, 110, 0.08) 100%);
+  transform: scale(1.08);
 }
 
 .agent-label {
-  font-size: 17px;
+  font-size: 1rem;
   font-weight: 700;
-  margin-bottom: var(--spacing-sm);
-  color: var(--color-primary);
-  position: relative;
-  z-index: 1;
-  letter-spacing: -0.3px;
+  color: #f5fbff;
+  margin-bottom: var(--spacing-xxs);
 }
 
 .agent-sub {
-  font-size: 13px;
-  color: var(--color-text-light);
+  color: var(--color-text-muted);
+  font-size: 0.92rem;
+  line-height: 1.6;
   margin-bottom: var(--spacing-md);
-  position: relative;
-  z-index: 1;
-  font-weight: 400;
-  line-height: 1.5;
 }
 
 .agent-hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-sm);
-  font-size: 12px;
-  color: var(--accent-color);
-  font-weight: 600;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--color-accent);
   opacity: 0;
-  transition: var(--transition);
-  position: relative;
-  z-index: 1;
   transform: translateY(8px);
+  transition: var(--transition);
 }
 
 .agent-card:hover .agent-hover {
@@ -130,16 +79,11 @@
 }
 
 .agent-hover i {
-  transition: var(--transition-bounce);
-  display: inline-block;
+  transition: transform 0.35s ease;
 }
 
 .agent-card:hover .agent-hover i {
   transform: translateX(3px);
-}
-
-.agent-card:hover .agent-hover i {
-  transform: translateX(4px);
 }
 
 @media (max-width: 768px) {
@@ -147,11 +91,7 @@
     padding: var(--spacing-md);
   }
 
-  .agent-icon {
-    font-size: 24px;
-  }
-
   .agent-label {
-    font-size: 14px;
+    font-size: 0.96rem;
   }
 }

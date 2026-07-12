@@ -2,12 +2,12 @@ import { AGENTS } from '../constants/agents';
 import AgentCard from './AgentCard';
 import '../styles/AgentSelector.css';
 
-export default function AgentSelector({ onSelectAgent }) {
+export default function AgentSelector({ onSelectAgent, selectedAgent }) {
   return (
     <div className="agent-selector">
       <div className="selector-header">
-        <h2>Choose Your Agent</h2>
-        <p>Select an agent to guide your strategic decision-making</p>
+        <h2>{selectedAgent ? 'Choose another agent' : 'Choose Your Agent'}</h2>
+        <p>Select an agent to guide your strategic decision-making in the CEO dashboard.</p>
       </div>
 
       <div className="agents-grid">
@@ -21,7 +21,7 @@ export default function AgentSelector({ onSelectAgent }) {
       </div>
 
       <div className="selector-footer">
-        <p>Each agent specializes in a different aspect of scaling Marker Media</p>
+        <p>Each agent specializes in a different aspect of scaling Marker Media.</p>
       </div>
     </div>
   );

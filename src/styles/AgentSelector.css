@@ -1,51 +1,46 @@
 .agent-selector {
   width: 100%;
-  max-width: 1200px;
   animation: fadeUp 0.6s ease-out;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
 }
 
 .selector-header {
-  text-align: center;
-  margin-bottom: var(--spacing-xl);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: var(--spacing-lg) var(--spacing-xl);
+  border-bottom: 1px solid rgba(77, 211, 255, 0.1);
 }
 
 .selector-header h2 {
-  font-size: 28px;
-  font-weight: 700;
-  margin-bottom: var(--spacing-sm);
-  color: var(--color-primary);
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--accent-color) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: -0.5px;
+  font-size: clamp(1.8rem, 2.5vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: white;
 }
 
 .selector-header p {
-  color: var(--color-text-light);
-  font-size: 15px;
-  font-weight: 400;
-  letter-spacing: 0.2px;
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  max-width: 680px;
 }
 
 .agents-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: var(--spacing-lg);
-  margin-bottom: var(--spacing-xl);
-  animation: gridAppear 0.7s ease-out;
+  padding: var(--spacing-lg) var(--spacing-xl);
 }
 
 .selector-footer {
-  text-align: center;
-  color: var(--color-text-light);
-  font-size: 13px;
-  font-weight: 500;
-  padding: var(--spacing-md);
-  background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(10px);
-  border-radius: var(--radius-lg);
-  border: 1px solid rgba(255, 255, 255, 0.6);
+  padding: var(--spacing-md) var(--spacing-xl);
+  color: var(--color-text-muted);
+  font-size: 0.88rem;
+  background: rgba(16, 28, 46, 0.82);
+  border-top: 1px solid rgba(77, 211, 255, 0.08);
 }
 
 @keyframes fadeUp {
@@ -59,22 +54,17 @@
   }
 }
 
-@keyframes gridAppear {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
 @media (max-width: 768px) {
-  .selector-header h2 {
-    font-size: 24px;
+  .selector-header {
+    padding: var(--spacing-md);
   }
 
   .agents-grid {
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: var(--spacing-md);
+    padding: var(--spacing-md);
+  }
+
+  .selector-footer {
+    padding: var(--spacing-md);
   }
 }

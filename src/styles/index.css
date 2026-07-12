@@ -5,54 +5,65 @@
 }
 
 :root {
-  --color-primary: #0f172a;
-  --color-secondary: #f8fafc;
-  --color-accent: #C9A96E;
-  --color-accent-light: #E8D5B7;
-  --color-accent-dark: #9d7f5a;
-  --color-border: #e2e8f0;
-  --color-text: #1e293b;
-  --color-text-light: #64748b;
-  --color-success: #10b981;
-  --color-error: #ef4444;
-  
+  --color-bg: #030b14;
+  --color-surface: rgba(8, 18, 31, 0.92);
+  --color-surface-soft: rgba(16, 30, 49, 0.82);
+  --color-panel: rgba(6, 14, 24, 0.88);
+  --color-border: rgba(56, 182, 255, 0.18);
+  --color-border-strong: rgba(56, 182, 255, 0.35);
+  --color-accent: #4dd3ff;
+  --color-accent-soft: #2ac7b7;
+  --color-text: #e4f7ff;
+  --color-text-muted: #7aa9c7;
+  --color-text-soft: #a8cbdc;
+  --color-success: #64ffda;
+  --color-error: #ff7a7a;
+
   --spacing-xs: 4px;
-  --spacing-sm: 8px;
-  --spacing-md: 16px;
-  --spacing-lg: 24px;
-  --spacing-xl: 32px;
-  
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 16px;
-  
-  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --spacing-sm: 10px;
+  --spacing-md: 18px;
+  --spacing-lg: 28px;
+  --spacing-xl: 36px;
+  --spacing-xxl: 56px;
+
+  --radius-sm: 8px;
+  --radius-md: 18px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+
+  --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  color: var(--color-text);
+  background: radial-gradient(circle at top left, rgba(40, 164, 255, 0.1), transparent 20%),
+    radial-gradient(circle at bottom right, rgba(109, 245, 255, 0.08), transparent 18%),
+    linear-gradient(180deg, #02070f 0%, #04101b 40%, #061525 100%);
+  background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 50%, #f5e6d3 100%);
-  background-attachment: fixed;
-  color: var(--color-text);
 }
 
 button {
   cursor: pointer;
   border: none;
   background: none;
+  color: inherit;
   font-family: inherit;
   font-size: inherit;
   transition: var(--transition);
-  font-weight: 500;
 }
 
 button:hover:not(:disabled) {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 
 button:disabled {
@@ -60,11 +71,16 @@ button:disabled {
   cursor: not-allowed;
 }
 
-input {
+input,
+textarea,
+select {
   font-family: inherit;
   font-size: inherit;
+  color: inherit;
 }
 
-input:disabled {
-  opacity: 0.6;
+input:disabled,
+textarea:disabled,
+select:disabled {
+  opacity: 0.7;
 }
