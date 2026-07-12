@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { anthropicClient } from '../services/anthropic';
+import { anthropicClient, isAnthropicConfigured } from '../services/anthropic';
 import MessageBubble from './MessageBubble';
 import ChatNavBar from './ChatNavBar';
 import ChatHistory from './ChatHistory';
@@ -100,6 +100,11 @@ export default function AgentChat({ agent, onBack }) {
                 {agent.id === 'clients' && 'Who is your ideal client right now?'}
                 {agent.id === 'execution' && 'What was your top commitment?'}
               </p>
+              {!isAnthropicConfigured() && (
+                <p className="greeting" style={{ fontSize: '0.95rem', marginTop: '0.5rem', opacity: 0.8 }}>
+                  Local mode is active. Send a message to see the built-in strategic response flow.
+                </p>
+              )}
             </div>
           </div>
 
