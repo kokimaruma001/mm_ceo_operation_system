@@ -13,9 +13,14 @@
   --color-border-strong: rgba(56, 182, 255, 0.35);
   --color-accent: #4dd3ff;
   --color-accent-soft: #2ac7b7;
+  --accent-color: #4dd3ff;
+  --accent-dark: #1ea7cd;
+  --accent-light: #8ff4ff;
+  --color-primary: #38d3ff;
   --color-text: #e4f7ff;
   --color-text-muted: #7aa9c7;
   --color-text-soft: #a8cbdc;
+  --color-text-light: #f3faff;
   --color-success: #64ffda;
   --color-error: #ff7a7a;
 
