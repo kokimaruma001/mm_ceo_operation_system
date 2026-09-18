@@ -10,6 +10,7 @@ from marker_media_agents import (
     FinancialManagementAgent,
     SocialMediaContentAgent,
 )
+from web_dashboard import get_agent_catalog, route_task_payload
 
 
 def test_master_orchestrator_routes_by_stage():
@@ -40,3 +41,13 @@ def test_agents_have_required_metadata():
         assert instance.prompt
         assert instance.kpis
         assert instance.responsibilities
+
+
+def test_dashboard_catalog_and_routing():
+    catalog = get_agent_catalog()
+    assert catalog[0]["name"] == "Master Orchestrator"
+    assert len(catalog) == 9
+
+    payload = route_task_payload("new lead inquiry")
+    assert payload["selected_agent"] == "Client Relations Agent"
+    assert payload["task"] == "new lead inquiry"
