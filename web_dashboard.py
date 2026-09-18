@@ -15,6 +15,7 @@ def get_agent_catalog() -> List[Dict[str, object]]:
                 "mission": instance.mission,
                 "kpis": instance.kpis,
                 "responsibilities": instance.responsibilities,
+                "prompt": instance.prompt,
             }
         )
     return catalog
